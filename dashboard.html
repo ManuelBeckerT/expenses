@@ -1529,11 +1529,15 @@ const txnMonthSel = document.getElementById('txnMonthSel');
   txnMonthSel.appendChild(btn);
 });
 
-// ── Collapsible sections ───────────────────────────────────────────────────
-document.querySelectorAll('.card').forEach(card => {
-  const h2 = card.querySelector(':scope > h2');
-  if (!h2) return;
-  h2.addEventListener('click', () => card.classList.toggle('collapsed'));
+// ── Collapsible sections (accordion, closed by default) ───────────────────
+const _cards = Array.from(document.querySelectorAll('.card')).filter(c => c.querySelector(':scope > h2'));
+_cards.forEach(card => {
+  card.classList.add('collapsed');
+  card.querySelector(':scope > h2').addEventListener('click', () => {
+    const wasCollapsed = card.classList.contains('collapsed');
+    _cards.forEach(c => c.classList.add('collapsed'));
+    if (wasCollapsed) card.classList.remove('collapsed');
+  });
 });
 </script>
 </body>
