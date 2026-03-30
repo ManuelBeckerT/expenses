@@ -163,8 +163,9 @@
     <h2>Gasto mensual por categoría</h2>
     <p class="muted" style="margin-bottom:14px">Nota: Abril 2025 es un mes parcial (período incompleto de la cartola).</p>
     <div class="chart-wrap">
-      <canvas id="barChart"></canvas>
+      <canvas id="barChart" style="max-height:380px"></canvas>
     </div>
+    <div id="barLegend" style="margin-top:14px;line-height:1.8"></div>
   </div>
 
   <!-- Pie + monthly table -->
@@ -768,39 +769,115 @@
 const PIE_DATA   = {"2025-04": {"labels": ["Supermercado", "Farmacia/Salud", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Cosmetica/Belleza", "Estacionamiento", "Mascotas", "Cine/Entretenimiento", "Intereses/Cargos bancarios"], "values": [375052, 261155, 6534, 138380, 10200, 163360, 89220, 5000, 65357, 40930, 98392, 42556, 40980, 31000, 2322], "colors": ["#27AE60", "#E67E22", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#FD79A8", "#B2BEC3", "#55EFC4", "#D63031", "#D35400"]}, "2025-05": {"labels": ["Seguros", "Supermercado", "Farmacia/Salud", "Hoteles/Alojamiento", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Cosmetica/Belleza", "Estacionamiento", "Mascotas", "Auto/Vehiculo", "Tecnologia", "Intereses/Cargos bancarios"], "values": [2247367, 824497, 134429, 1064751, 326246, 674828, 198220, 62690, 63106, 251335, 40000, 57084, 30980, 1500, 52466, 39990, 32000, 59990, 1970], "colors": ["#E74C3C", "#27AE60", "#E67E22", "#1ABC9C", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#00B894", "#6C5CE7", "#A29BFE", "#FD79A8", "#B2BEC3", "#55EFC4", "#636E72", "#0984E3", "#D35400"]}, "2025-06": {"labels": ["Seguros", "Supermercado", "Farmacia/Salud", "Hoteles/Alojamiento", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Cosmetica/Belleza", "Estacionamiento", "Cine/Entretenimiento", "Peajes/Autopistas"], "values": [2664124, 351096, 48810, 1134217, 258420, 394435, 758882, 534133, 146958, 126819, 147193, 40000, 15680, 30980, 18558, 50076, 47771, 15838], "colors": ["#E74C3C", "#27AE60", "#E67E22", "#1ABC9C", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#FD79A8", "#B2BEC3", "#D63031", "#DFE6E9"]}, "2025-07": {"labels": ["Seguros", "Municipalidad/Contribuciones", "Supermercado", "Farmacia/Salud", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Hogar/Limpieza", "Estacionamiento", "Mascotas"], "values": [2256603, 3996409, 665453, 2518684, 342302, 10958, 47300, 238649, 26190, 190169, 172280, 60000, 53990, 34580, 62875, 56900, 39990], "colors": ["#E74C3C", "#8E44AD", "#27AE60", "#E67E22", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#74B9FF", "#B2BEC3", "#55EFC4"]}, "2025-08": {"labels": ["Seguros", "Supermercado", "Farmacia/Salud", "Golf/Club deportivo", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Hogar/Limpieza", "Cosmetica/Belleza", "Estacionamiento", "Mascotas", "Intereses/Cargos bancarios"], "values": [2248043, 795678, 124454, 260880, 48949, 378091, 172128, 176667, 74892, 70000, 76597, 30980, 46400, 93010, 93232, 38480, 67], "colors": ["#E74C3C", "#27AE60", "#E67E22", "#F1C40F", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#74B9FF", "#FD79A8", "#B2BEC3", "#55EFC4", "#D35400"]}, "2025-09": {"labels": ["Seguros", "Supermercado", "Farmacia/Salud", "Hoteles/Alojamiento", "Golf/Club deportivo", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Estacionamiento", "Mascotas", "Auto/Vehiculo", "Telecom/TV", "Intereses/Cargos bancarios"], "values": [77351, 581035, 64265, 470873, 300317, 157023, 151350, 124549, 310970, 246950, 40000, 137206, 52470, 37738, 37990, 8405, 10000, 3939], "colors": ["#E74C3C", "#27AE60", "#E67E22", "#1ABC9C", "#F1C40F", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#B2BEC3", "#55EFC4", "#636E72", "#FDCB6E", "#D35400"]}, "2025-10": {"labels": ["Seguros", "Supermercado", "Educacion", "Farmacia/Salud", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Estacionamiento", "Intereses/Cargos bancarios"], "values": [77530, 194686, 557791, 153847, 316060, 372686, 94694, 176912, 315188, 127736, 35370, 95400, 204448, 155510, 20817, 7185], "colors": ["#E74C3C", "#27AE60", "#2980B9", "#E67E22", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#B2BEC3", "#D35400"]}, "2025-11": {"labels": ["Seguros", "Supermercado", "Educacion", "Farmacia/Salud", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Hogar/Limpieza", "Estacionamiento", "Mascotas", "Telecom/TV", "Intereses/Cargos bancarios"], "values": [77760, 51100, 1716939, 148729, 262320, 738878, 279791, 24780, 111762, 128181, 323111, 340000, 30920, 48850, 157131, 42835, 39990, 5000, 321], "colors": ["#E74C3C", "#27AE60", "#2980B9", "#E67E22", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#74B9FF", "#B2BEC3", "#55EFC4", "#FDCB6E", "#D35400"]}, "2025-12": {"labels": ["Seguros", "Supermercado", "Educacion", "Farmacia/Salud", "Hoteles/Alojamiento", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Hogar/Limpieza", "Estacionamiento", "Mascotas"], "values": [77840, 1321922, 1720803, 166236, 975993, 262310, 157864, 176830, 161300, 151327, 177431, 200000, 65000, 80920, 35380, 240800, 29803, 39990], "colors": ["#E74C3C", "#27AE60", "#2980B9", "#E67E22", "#1ABC9C", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#74B9FF", "#B2BEC3", "#55EFC4"]}, "2026-01": {"labels": ["Seguros", "Municipalidad/Contribuciones", "Supermercado", "Educacion", "Farmacia/Salud", "Hoteles/Alojamiento", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Cosmetica/Belleza", "Estacionamiento", "Telecom/TV", "Intereses/Cargos bancarios"], "values": [206595, 4044366, 709698, 532438, 287214, 595512, 372830, 22821, 103460, 53390, 158721, 52018, 229970, 40000, 55920, 114220, 340490, 61080, 10000, 1213], "colors": ["#E74C3C", "#8E44AD", "#27AE60", "#2980B9", "#E67E22", "#1ABC9C", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#FD79A8", "#B2BEC3", "#FDCB6E", "#D35400"]}, "2026-02": {"labels": ["Seguros", "Supermercado", "Educacion", "Farmacia/Salud", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Hogar/Limpieza", "Estacionamiento", "Auto/Vehiculo", "Telecom/TV"], "values": [206366, 115174, 523940, 40108, 279900, 69150, 58080, 165520, 73412, 40000, 32008, 37580, 34300, 2100, 118792, 41475], "colors": ["#E74C3C", "#27AE60", "#2980B9", "#E67E22", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#00B894", "#6C5CE7", "#A29BFE", "#74B9FF", "#B2BEC3", "#636E72", "#FDCB6E"]}, "2026-03": {"labels": ["Seguros", "Supermercado", "Farmacia/Salud", "Golf/Club deportivo", "Restaurantes/Comida", "Otros", "Combustible", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Hogar/Limpieza", "Cosmetica/Belleza", "Estacionamiento", "Mascotas", "Tecnologia"], "values": [206954, 868245, 359375, 391603, 72430, 64790, 54819, 40000, 30920, 37580, 26000, 1200, 28608, 39990, 62295], "colors": ["#E74C3C", "#27AE60", "#E67E22", "#F1C40F", "#E91E63", "#95A5A6", "#F39C12", "#00B894", "#6C5CE7", "#A29BFE", "#74B9FF", "#FD79A8", "#B2BEC3", "#55EFC4", "#0984E3"]}, "all": {"labels": ["Seguros", "Municipalidad/Contribuciones", "Supermercado", "Educacion", "Farmacia/Salud", "Hoteles/Alojamiento", "Golf/Club deportivo", "Viajes/Transporte", "Restaurantes/Comida", "Otros", "Combustible", "Condominio/Gastos comunes", "Ropa/Moda", "Donaciones/Aportes", "Servicios digitales", "Vinos/Bebidas", "Hogar/Limpieza", "Cosmetica/Belleza", "Estacionamiento", "Mascotas", "Auto/Vehiculo", "Tecnologia", "Cine/Entretenimiento", "Telecom/TV", "Intereses/Cargos bancarios", "Peajes/Autopistas"], "values": [10346533, 8040775, 6853636, 5051911, 4307306, 4241346, 3373188, 2448154, 2134039, 2021805, 1561520, 1541326, 1518986, 875400, 841050, 650040, 567506, 553150, 518211, 317400, 159197, 122285, 78771, 66475, 17017, 15838], "colors": ["#E74C3C", "#8E44AD", "#27AE60", "#2980B9", "#E67E22", "#1ABC9C", "#F1C40F", "#3498DB", "#E91E63", "#95A5A6", "#F39C12", "#9B59B6", "#FF7675", "#00B894", "#6C5CE7", "#A29BFE", "#74B9FF", "#FD79A8", "#B2BEC3", "#55EFC4", "#636E72", "#0984E3", "#D63031", "#FDCB6E", "#D35400", "#DFE6E9"]}};
 const MONTHS     = ["2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03"];
 const MONTH_LBLS = {"2025-04": "Abr 25", "2025-05": "May 25", "2025-06": "Jun 25", "2025-07": "Jul 25", "2025-08": "Ago 25", "2025-09": "Sep 25", "2025-10": "Oct 25", "2025-11": "Nov 25", "2025-12": "Dic 25", "2026-01": "Ene 26", "2026-02": "Feb 26", "2026-03": "Mar 26"};
+const MEDIAN     = 4723334;
+const AVG        = 5137525;
+const MEDIAN_FMT = '$4,723,334';
+const AVG_FMT    = '$5,137,525';
 
-// ── Bar chart ────────────────────────────────────────────────────────────────
-const barCtx = document.getElementById('barChart').getContext('2d');
-new Chart(barCtx, {
-  type: 'bar',
-  data: {
-    labels: ["Abr 25", "May 25", "Jun 25", "Jul 25", "Ago 25", "Sep 25", "Oct 25", "Nov 25", "Dic 25", "Ene 26", "Feb 26", "Mar 26"],
-    datasets: [{"label": "Peajes/Autopistas", "data": [0, 0, 15838, 0, 0, 0, 0, 0, 0, 0, 0, 0], "backgroundColor": "#DFE6E9", "borderWidth": 0, "stack": "gastos"}, {"label": "Intereses/Cargos bancarios", "data": [2322, 1970, 0, 0, 67, 3939, 7185, 321, 0, 1213, 0, 0], "backgroundColor": "#D35400", "borderWidth": 0, "stack": "gastos"}, {"label": "Telecom/TV", "data": [0, 0, 0, 0, 0, 10000, 0, 5000, 0, 10000, 41475, 0], "backgroundColor": "#FDCB6E", "borderWidth": 0, "stack": "gastos"}, {"label": "Cine/Entretenimiento", "data": [31000, 0, 47771, 0, 0, 0, 0, 0, 0, 0, 0, 0], "backgroundColor": "#D63031", "borderWidth": 0, "stack": "gastos"}, {"label": "Tecnologia", "data": [0, 59990, 0, 0, 0, 0, 0, 0, 0, 0, 0, 62295], "backgroundColor": "#0984E3", "borderWidth": 0, "stack": "gastos"}, {"label": "Auto/Vehiculo", "data": [0, 32000, 0, 0, 0, 8405, 0, 0, 0, 0, 118792, 0], "backgroundColor": "#636E72", "borderWidth": 0, "stack": "gastos"}, {"label": "Mascotas", "data": [40980, 39990, 0, 39990, 38480, 37990, 0, 39990, 39990, 0, 0, 39990], "backgroundColor": "#55EFC4", "borderWidth": 0, "stack": "gastos"}, {"label": "Estacionamiento", "data": [42556, 52466, 50076, 56900, 93232, 37738, 20817, 42835, 29803, 61080, 2100, 28608], "backgroundColor": "#B2BEC3", "borderWidth": 0, "stack": "gastos"}, {"label": "Cosmetica/Belleza", "data": [98392, 1500, 18558, 0, 93010, 0, 0, 0, 0, 340490, 0, 1200], "backgroundColor": "#FD79A8", "borderWidth": 0, "stack": "gastos"}, {"label": "Hogar/Limpieza", "data": [0, 0, 0, 62875, 46400, 0, 0, 157131, 240800, 0, 34300, 26000], "backgroundColor": "#74B9FF", "borderWidth": 0, "stack": "gastos"}, {"label": "Vinos/Bebidas", "data": [40930, 30980, 30980, 34580, 30980, 52470, 155510, 48850, 35380, 114220, 37580, 37580], "backgroundColor": "#A29BFE", "borderWidth": 0, "stack": "gastos"}, {"label": "Servicios digitales", "data": [65357, 57084, 15680, 53990, 76597, 137206, 204448, 30920, 80920, 55920, 32008, 30920], "backgroundColor": "#6C5CE7", "borderWidth": 0, "stack": "gastos"}, {"label": "Donaciones/Aportes", "data": [5000, 40000, 40000, 60000, 70000, 40000, 95400, 340000, 65000, 40000, 40000, 40000], "backgroundColor": "#00B894", "borderWidth": 0, "stack": "gastos"}, {"label": "Ropa/Moda", "data": [89220, 0, 147193, 172280, 74892, 246950, 35370, 323111, 200000, 229970, 0, 0], "backgroundColor": "#FF7675", "borderWidth": 0, "stack": "gastos"}, {"label": "Condominio/Gastos comunes", "data": [0, 251335, 126819, 190169, 176667, 310970, 127736, 128181, 177431, 52018, 0, 0], "backgroundColor": "#9B59B6", "borderWidth": 0, "stack": "gastos"}, {"label": "Combustible", "data": [163360, 63106, 146958, 26190, 172128, 124549, 315188, 111762, 151327, 158721, 73412, 54819], "backgroundColor": "#F39C12", "borderWidth": 0, "stack": "gastos"}, {"label": "Otros", "data": [10200, 62690, 534133, 238649, 378091, 151350, 176912, 24780, 161300, 53390, 165520, 64790], "backgroundColor": "#95A5A6", "borderWidth": 0, "stack": "gastos"}, {"label": "Restaurantes/Comida", "data": [138380, 198220, 758882, 47300, 48949, 157023, 94694, 279791, 176830, 103460, 58080, 72430], "backgroundColor": "#E91E63", "borderWidth": 0, "stack": "gastos"}, {"label": "Viajes/Transporte", "data": [6534, 674828, 394435, 10958, 0, 0, 372686, 738878, 157864, 22821, 69150, 0], "backgroundColor": "#3498DB", "borderWidth": 0, "stack": "gastos"}, {"label": "Golf/Club deportivo", "data": [0, 326246, 258420, 342302, 260880, 300317, 316060, 262320, 262310, 372830, 279900, 391603], "backgroundColor": "#F1C40F", "borderWidth": 0, "stack": "gastos"}, {"label": "Hoteles/Alojamiento", "data": [0, 1064751, 1134217, 0, 0, 470873, 0, 0, 975993, 595512, 0, 0], "backgroundColor": "#1ABC9C", "borderWidth": 0, "stack": "gastos"}, {"label": "Farmacia/Salud", "data": [261155, 134429, 48810, 2518684, 124454, 64265, 153847, 148729, 166236, 287214, 40108, 359375], "backgroundColor": "#E67E22", "borderWidth": 0, "stack": "gastos"}, {"label": "Educacion", "data": [0, 0, 0, 0, 0, 0, 557791, 1716939, 1720803, 532438, 523940, 0], "backgroundColor": "#2980B9", "borderWidth": 0, "stack": "gastos"}, {"label": "Supermercado", "data": [375052, 824497, 351096, 665453, 795678, 581035, 194686, 51100, 1321922, 709698, 115174, 868245], "backgroundColor": "#27AE60", "borderWidth": 0, "stack": "gastos"}, {"label": "Municipalidad/Contribuciones", "data": [0, 0, 0, 3996409, 0, 0, 0, 0, 0, 4044366, 0, 0], "backgroundColor": "#8E44AD", "borderWidth": 0, "stack": "gastos"}, {"label": "Seguros", "data": [0, 2247367, 2664124, 2256603, 2248043, 77351, 77530, 77760, 77840, 206595, 206366, 206954], "backgroundColor": "#E74C3C", "borderWidth": 0, "stack": "gastos"}, {"label": "Mediana ($4,723,334)", "data": [4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334], "type": "line", "borderColor": "#00B894", "borderWidth": 2, "borderDash": [6, 4], "pointRadius": 0, "fill": false, "order": 0, "stack": null}, {"label": "Promedio ($5,137,525)", "data": [5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525], "type": "line", "borderColor": "#E74C3C", "borderWidth": 2, "borderDash": [3, 3], "pointRadius": 0, "fill": false, "order": 0, "stack": null}]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
-      tooltip: {
-        callbacks: {
-          label: ctx => ` ${ctx.dataset.label}: $` + ctx.parsed.y.toLocaleString('es-CL'),
-          footer: items => `Total: $` + items.reduce((s,i)=>s+i.parsed.y,0).toLocaleString('es-CL'),
+// ── Bar chart — per-month sorted stacking (floating bars) ─────────────────
+(function() {
+  const labels = ["Abr 25", "May 25", "Jun 25", "Jul 25", "Ago 25", "Sep 25", "Oct 25", "Nov 25", "Dic 25", "Ene 26", "Feb 26", "Mar 26"];
+  const nMonths = labels.length;
+
+  // For each month build a sorted stack (desc), compute [bottom, top] per segment
+  const monthStacks = labels.map((lbl, mi) => {
+    const segs = Object.entries(CAT_DATA)
+      .map(([cat, d]) => ({ cat, value: d.monthly[mi], color: d.color }))
+      .filter(s => s.value > 0)
+      .sort((a, b) => b.value - a.value);
+    let cum = 0;
+    return segs.map(s => {
+      const seg = { cat: s.cat, value: s.value, color: s.color, bottom: cum, top: cum + s.value };
+      cum += s.value;
+      return seg;
+    });
+  });
+
+  const maxRanks = Math.max(...monthStacks.map(m => m.length));
+
+  // One dataset per rank position; color + category change per bar
+  const datasets = [];
+  for (let rank = 0; rank < maxRanks; rank++) {
+    datasets.push({
+      type: 'bar',
+      data:            monthStacks.map(m => m[rank] ? [m[rank].bottom, m[rank].top] : null),
+      backgroundColor: monthStacks.map(m => m[rank] ? m[rank].color + 'dd' : 'transparent'),
+      borderColor:     monthStacks.map(m => m[rank] ? m[rank].color : 'transparent'),
+      borderWidth: 0,
+      borderSkipped: false,
+      // store metadata for tooltip
+      _cats: monthStacks.map(m => m[rank]?.cat  ?? null),
+      _vals: monthStacks.map(m => m[rank]?.value ?? 0),
+    });
+  }
+
+  // Median + average reference lines
+  datasets.push({
+    type: 'line', label: `Mediana (${MEDIAN_FMT})`,
+    data: Array(nMonths).fill(MEDIAN),
+    borderColor: '#00B894', borderWidth: 2, borderDash: [6,4],
+    pointRadius: 0, fill: false,
+  });
+  datasets.push({
+    type: 'line', label: `Promedio (${AVG_FMT})`,
+    data: Array(nMonths).fill(AVG),
+    borderColor: '#E74C3C', borderWidth: 2, borderDash: [3,3],
+    pointRadius: 0, fill: false,
+  });
+
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  new Chart(barCtx, {
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            boxWidth: 14, font: { size: 11 },
+            filter: item => item.datasetIndex >= maxRanks, // only show median/avg lines
+          }
+        },
+        tooltip: {
+          mode: 'index',
+          filter: item => item.dataset._cats?.[item.dataIndex] != null,
+          callbacks: {
+            title: items => items[0]?.label ?? '',
+            label: item => {
+              const cat = item.dataset._cats?.[item.dataIndex];
+              const val = item.dataset._vals?.[item.dataIndex];
+              if (!cat) return null;
+              return ` ${cat}: $${val.toLocaleString('es-CL')}`;
+            },
+            footer: items => {
+              const total = items.reduce((s, i) => s + (i.dataset._vals?.[i.dataIndex] ?? 0), 0);
+              return `Total: $${total.toLocaleString('es-CL')}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: {
+          ticks: { callback: v => '$' + (v/1000000).toFixed(1) + 'M', font: { size: 11 } },
+          grid: { color: '#f0f2f5' }
         }
       }
-    },
-    scales: {
-      x: { stacked: true, grid: { display: false } },
-      y: {
-        stacked: true,
-        ticks: {
-          callback: v => '$' + (v/1000000).toFixed(1) + 'M',
-          font: { size: 11 }
-        },
-        grid: { color: '#f0f2f5' }
-      }
     }
-  }
-});
+  });
+
+  // Custom category legend sorted by total desc
+  const allCatsSorted = Object.entries(CAT_DATA)
+    .filter(([,d]) => d.total > 0)
+    .sort((a, b) => b[1].total - a[1].total);
+  const legendEl = document.getElementById('barLegend');
+  legendEl.innerHTML = allCatsSorted.map(([cat, d]) =>
+    `<span style="display:inline-flex;align-items:center;margin:3px 10px 3px 0;font-size:11px;color:#636e72">
+      <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:${d.color};margin-right:5px;flex-shrink:0"></span>
+      ${cat}
+    </span>`
+  ).join('');
+})();
 
 // ── Pie chart ────────────────────────────────────────────────────────────────
 const pieCtx = document.getElementById('pieChart').getContext('2d');
