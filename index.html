@@ -162,11 +162,29 @@
   <div class="card">
     <h2>Gasto mensual por categoría</h2>
     <p class="muted" style="margin-bottom:14px">Nota: Abril 2025 es un mes parcial (período incompleto de la cartola).</p>
-    <div class="chart-wrap" style="position:relative">
-      <canvas id="barChart" style="max-height:360px"></canvas>
-      <div id="barTooltip" style="display:none;position:fixed;background:rgba(30,30,30,.92);color:white;
-           padding:10px 14px;border-radius:8px;font-size:0.8rem;line-height:1.9;
-           pointer-events:none;z-index:999;max-width:280px;box-shadow:0 4px 12px rgba(0,0,0,.2)"></div>
+    <div style="display:flex;gap:20px;align-items:flex-start">
+      <div class="chart-wrap" style="position:relative;flex:1;min-width:0">
+        <canvas id="barChart" style="max-height:360px"></canvas>
+        <div id="barTooltip" style="display:none;position:fixed;background:rgba(30,30,30,.92);color:white;
+             padding:10px 14px;border-radius:8px;font-size:0.8rem;line-height:1.9;
+             pointer-events:none;z-index:999;max-width:280px;box-shadow:0 4px 12px rgba(0,0,0,.2)"></div>
+      </div>
+      <div style="width:200px;flex-shrink:0;padding-top:8px">
+        <div style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <svg width="32" height="10"><line x1="0" y1="5" x2="32" y2="5" stroke="#00B894" stroke-width="2" stroke-dasharray="6,4"/></svg>
+            <span style="font-weight:600;font-size:0.82rem;color:#2d3436">Mediana</span>
+          </div>
+          <p style="font-size:0.78rem;color:#636e72;line-height:1.5;margin:0">$4,723,334/mes — el mes más representativo. La mitad de los meses gastó más que esto y la otra mitad menos.</p>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <svg width="32" height="10"><line x1="0" y1="5" x2="32" y2="5" stroke="#E74C3C" stroke-width="2" stroke-dasharray="3,3"/></svg>
+            <span style="font-weight:600;font-size:0.82rem;color:#2d3436">Promedio</span>
+          </div>
+          <p style="font-size:0.78rem;color:#636e72;line-height:1.5;margin:0">$5,137,525/mes — inflado por meses con gastos extraordinarios (viajes, colegiaturas). Usar la mediana da una mejor estimación del gasto habitual.</p>
+        </div>
+      </div>
     </div>
     <div id="barLegend" style="margin-top:14px;line-height:2"></div>
   </div>
