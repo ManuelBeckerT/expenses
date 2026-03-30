@@ -899,6 +899,55 @@
     <p class="note">* Los promedios mensuales excluyen Abril 2025 (mes parcial). Meses con viajes al exterior (Jun/Jul 2025) inflan los promedios discrecionales.</p>
   </div>
 
+  <!-- New insights -->
+  <div class="card">
+    <h2>Análisis de deuda y compromisos</h2>
+    <div class="insights-grid">
+
+      <div class="insight red">
+        <h3>Solo se paga el 30% de la factura mensual</h3>
+        <div class="big" style="color:#c0392b">30% promedio</div>
+        <ul>
+          <li>El mes más bajo: <b>Abr 25</b> — pagó solo el <b>14%</b> ($2,000,000 de $13,864,550)</li>
+          <li>El mes más alto: <b>Jul 25</b> — pagó el <b>45%</b> ($8,996,409 de $19,906,380)</li>
+          <li>Nunca se pagó el 100% del saldo en ningún período.</li>
+          <li>Para no acumular deuda, hay que pagar el <b>100% cada mes</b>.</li>
+        </ul>
+      </div>
+
+      <div class="insight red">
+        <h3>La deuda creció 137% en 12 meses</h3>
+        <div class="big" style="color:#c0392b">+137% en un año</div>
+        <ul>
+          <li>Inicio (Mar 2025): <b>$4,769,241</b></li>
+          <li>Hoy (Mar 2026): <b>$11,293,750</b></li>
+          <li>Crecimiento mensual promedio: <b>$250,430/mes</b></li>
+          <li>Cupo disponible restante: <b>$18,706,250</b> de $30,000,000</li>
+          
+        </ul>
+      </div>
+
+      <div class="insight yellow">
+        <h3>Compromisos mensuales inevitables</h3>
+        <div class="big">$4,172,797/mes</div>
+        <ul>
+          <li><b>Contratos ineludibles</b> (seguros, contribuciones, condominio, TV): $1,817,737/mes</li>
+          <li><b>Contratos opcionales</b> (golf, streaming, educación, donaciones): $921,959/mes — podrían cancelarse</li>
+          <li><b>Básicos variables</b> (supermercado, farmacia, bencina): $1,185,442/mes</li>
+          <li><b>Intereses deuda</b> (costo invisible): $247,658/mes</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Debt projection chart -->
+    <h3 style="margin:24px 0 12px;font-size:0.9rem;color:#636e72;text-transform:uppercase;letter-spacing:.04em">Proyección de la deuda si continúa la tendencia actual</h3>
+    <div class="chart-wrap">
+      <canvas id="debtProjectionChart" style="max-height:260px"></canvas>
+    </div>
+    <p class="note">* La proyección usa la tendencia lineal de los últimos 12 meses. La línea roja punteada indica el límite del cupo de compras ($30,000,000).</p>
+  </div>
+
 </div>
 
 <script>
@@ -1012,6 +1061,89 @@ const DEBT_PERIODS = [{"periodo_hasta": "24/03/2025", "periodo_desde": "25/02/20
           grid: { color: '#f0f2f5' },
         },
         x: { ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+})();
+
+// ── Debt projection chart ──────────────────────────────────────────────────
+(function() {
+  const fmt = n => '$' + (n/1e6).toFixed(1) + 'M';
+  const HIST_LABELS  = ["Mar 25", "Abr 25", "May 25", "Jun 25", "Jul 25", "Ago 25", "Sep 25", "Oct 25", "Nov 25", "Dic 25", "Ene 26", "Feb 26", "Mar 26"];
+  const HIST_SALDOS  = [4769241, 7125292, 11864553, 12585035, 14290364, 10909975, 15503860, 16431118, 13257729, 12044444, 10617752, 9042136, 11293750];
+  const PROJ_LABELS  = ["Abr 26", "May 26", "Jun 26", "Jul 26", "Ago 26", "Sep 26", "Oct 26", "Nov 26", "Dic 26", "Ene 27", "Feb 27", "Mar 27"];
+  const PROJ_SALDOS  = [13271102, 13521532, 13771961, 14022391, 14272820, 14523250, 14773679, 15024109, 15274538, 15524968, 15775397, 16025827];
+  const CUPO         = 30000000;
+
+  // Combine all labels; historical data = null for projection months, and vice versa
+  const allLabels = [...HIST_LABELS, ...PROJ_LABELS];
+  const histFull  = [...HIST_SALDOS, ...Array(PROJ_LABELS.length).fill(null)];
+  // Overlap: last historical point is first projected point for visual continuity
+  const projFull  = [...Array(HIST_LABELS.length - 1).fill(null), HIST_SALDOS[HIST_SALDOS.length - 1], ...PROJ_SALDOS];
+  const cupoLine  = Array(allLabels.length).fill(CUPO);
+
+  new Chart(document.getElementById('debtProjectionChart'), {
+    type: 'line',
+    data: {
+      labels: allLabels,
+      datasets: [
+        {
+          label: 'Saldo histórico',
+          data: histFull,
+          borderColor: '#E74C3C',
+          backgroundColor: 'rgba(231,76,60,0.08)',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: '#E74C3C',
+          fill: true,
+          tension: 0.25,
+          spanGaps: false,
+        },
+        {
+          label: 'Proyección (tendencia lineal)',
+          data: projFull,
+          borderColor: '#E74C3C',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [7, 5],
+          pointRadius: 3,
+          pointBackgroundColor: '#E74C3C',
+          pointStyle: 'circle',
+          fill: false,
+          tension: 0.25,
+          spanGaps: false,
+        },
+        {
+          label: 'Límite cupo ($30M)',
+          data: cupoLine,
+          borderColor: '#c0392b',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+          pointRadius: 0,
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + fmt(ctx.raw),
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: CUPO * 1.1,
+          ticks: { callback: v => '$' + (v/1e6).toFixed(0) + 'M', font: { size: 10 } },
+          grid: { color: '#f0f2f5' },
+        },
+        x: { ticks: { font: { size: 10 }, maxRotation: 45 } }
       }
     }
   });
