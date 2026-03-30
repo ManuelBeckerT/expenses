@@ -1,4 +1,6 @@
 raw/
+raw_pdf/
+debt_analysis.json
 *.py
 *.csv
 __pycache__/
