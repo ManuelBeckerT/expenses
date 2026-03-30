@@ -165,7 +165,6 @@
     <div class="chart-wrap">
       <canvas id="barChart" style="max-height:380px"></canvas>
     </div>
-    <div id="barLegend" style="margin-top:14px;line-height:1.8"></div>
   </div>
 
   <!-- Pie + monthly table -->
@@ -777,110 +776,35 @@ const CAT_DATA   = {"Seguros": {"color": "#E74C3C", "monthly": [0, 2247367, 2664
 const ALL_CATS   = ["Auto/Vehiculo", "Cine/Entretenimiento", "Combustible", "Condominio/Gastos comunes", "Cosmetica/Belleza", "Donaciones/Aportes", "Educacion", "Estacionamiento", "Farmacia/Salud", "Golf/Club deportivo", "Hogar/Limpieza", "Hoteles/Alojamiento", "Intereses/Cargos bancarios", "Mascotas", "Municipalidad/Contribuciones", "Otros", "Peajes/Autopistas", "Restaurantes/Comida", "Ropa/Moda", "Seguros", "Servicios digitales", "Supermercado", "Tecnologia", "Telecom/TV", "Viajes/Transporte", "Vinos/Bebidas"];
 const CHART_LBLS = ["Abr 25", "May 25", "Jun 25", "Jul 25", "Ago 25", "Sep 25", "Oct 25", "Nov 25", "Dic 25", "Ene 26", "Feb 26", "Mar 26"];
 
-// ── Bar chart — per-month sorted stacking (floating bars) ─────────────────
-(function() {
-  const labels = ["Abr 25", "May 25", "Jun 25", "Jul 25", "Ago 25", "Sep 25", "Oct 25", "Nov 25", "Dic 25", "Ene 26", "Feb 26", "Mar 26"];
-  const nMonths = labels.length;
-
-  // For each month build a sorted stack (desc), compute [bottom, top] per segment
-  const monthStacks = labels.map((lbl, mi) => {
-    const segs = Object.entries(CAT_DATA)
-      .map(([cat, d]) => ({ cat, value: d.monthly[mi], color: d.color }))
-      .filter(s => s.value > 0)
-      .sort((a, b) => b.value - a.value);
-    let cum = 0;
-    return segs.map(s => {
-      const seg = { cat: s.cat, value: s.value, color: s.color, bottom: cum, top: cum + s.value };
-      cum += s.value;
-      return seg;
-    });
-  });
-
-  const maxRanks = Math.max(...monthStacks.map(m => m.length));
-
-  // One dataset per rank position; color + category change per bar
-  const datasets = [];
-  for (let rank = 0; rank < maxRanks; rank++) {
-    datasets.push({
-      type: 'bar',
-      data:            monthStacks.map(m => m[rank] ? [m[rank].bottom, m[rank].top] : null),
-      backgroundColor: monthStacks.map(m => m[rank] ? m[rank].color + 'dd' : 'transparent'),
-      borderColor:     monthStacks.map(m => m[rank] ? m[rank].color : 'transparent'),
-      borderWidth: 0,
-      borderSkipped: false,
-      // store metadata for tooltip
-      _cats: monthStacks.map(m => m[rank]?.cat  ?? null),
-      _vals: monthStacks.map(m => m[rank]?.value ?? 0),
-    });
-  }
-
-  // Median + average reference lines
-  datasets.push({
-    type: 'line', label: `Mediana (${MEDIAN_FMT})`,
-    data: Array(nMonths).fill(MEDIAN),
-    borderColor: '#00B894', borderWidth: 2, borderDash: [6,4],
-    pointRadius: 0, fill: false,
-  });
-  datasets.push({
-    type: 'line', label: `Promedio (${AVG_FMT})`,
-    data: Array(nMonths).fill(AVG),
-    borderColor: '#E74C3C', borderWidth: 2, borderDash: [3,3],
-    pointRadius: 0, fill: false,
-  });
-
-  const barCtx = document.getElementById('barChart').getContext('2d');
-  new Chart(barCtx, {
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            boxWidth: 14, font: { size: 11 },
-            filter: item => item.datasetIndex >= maxRanks, // only show median/avg lines
-          }
-        },
-        tooltip: {
-          mode: 'index',
-          filter: item => item.dataset._cats?.[item.dataIndex] != null,
-          callbacks: {
-            title: items => items[0]?.label ?? '',
-            label: item => {
-              const cat = item.dataset._cats?.[item.dataIndex];
-              const val = item.dataset._vals?.[item.dataIndex];
-              if (!cat) return null;
-              return ` ${cat}: $${val.toLocaleString('es-CL')}`;
-            },
-            footer: items => {
-              const total = items.reduce((s, i) => s + (i.dataset._vals?.[i.dataIndex] ?? 0), 0);
-              return `Total: $${total.toLocaleString('es-CL')}`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: { grid: { display: false } },
-        y: {
-          ticks: { callback: v => '$' + (v/1000000).toFixed(1) + 'M', font: { size: 11 } },
-          grid: { color: '#f0f2f5' }
+// ── Bar chart ────────────────────────────────────────────────────────────────
+const barCtx = document.getElementById('barChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: ["Abr 25", "May 25", "Jun 25", "Jul 25", "Ago 25", "Sep 25", "Oct 25", "Nov 25", "Dic 25", "Ene 26", "Feb 26", "Mar 26"],
+    datasets: [{"label": "Seguros", "data": [0, 2247367, 2664124, 2256603, 2248043, 77351, 77530, 77760, 77840, 206595, 206366, 206954], "backgroundColor": "#E74C3C", "borderWidth": 0, "stack": "gastos"}, {"label": "Municipalidad/Contribuciones", "data": [0, 0, 0, 3996409, 0, 0, 0, 0, 0, 4044366, 0, 0], "backgroundColor": "#8E44AD", "borderWidth": 0, "stack": "gastos"}, {"label": "Supermercado", "data": [375052, 824497, 351096, 665453, 795678, 581035, 194686, 51100, 1321922, 709698, 115174, 868245], "backgroundColor": "#27AE60", "borderWidth": 0, "stack": "gastos"}, {"label": "Educacion", "data": [0, 0, 0, 0, 0, 0, 557791, 1716939, 1720803, 532438, 523940, 0], "backgroundColor": "#2980B9", "borderWidth": 0, "stack": "gastos"}, {"label": "Farmacia/Salud", "data": [261155, 134429, 48810, 2518684, 124454, 64265, 153847, 148729, 166236, 287214, 40108, 359375], "backgroundColor": "#E67E22", "borderWidth": 0, "stack": "gastos"}, {"label": "Hoteles/Alojamiento", "data": [0, 1064751, 1134217, 0, 0, 470873, 0, 0, 975993, 595512, 0, 0], "backgroundColor": "#1ABC9C", "borderWidth": 0, "stack": "gastos"}, {"label": "Golf/Club deportivo", "data": [0, 326246, 258420, 342302, 260880, 300317, 316060, 262320, 262310, 372830, 279900, 391603], "backgroundColor": "#F1C40F", "borderWidth": 0, "stack": "gastos"}, {"label": "Viajes/Transporte", "data": [6534, 674828, 394435, 10958, 0, 0, 372686, 738878, 157864, 22821, 69150, 0], "backgroundColor": "#3498DB", "borderWidth": 0, "stack": "gastos"}, {"label": "Restaurantes/Comida", "data": [138380, 198220, 758882, 47300, 48949, 157023, 94694, 279791, 176830, 103460, 58080, 72430], "backgroundColor": "#E91E63", "borderWidth": 0, "stack": "gastos"}, {"label": "Otros", "data": [10200, 62690, 534133, 238649, 378091, 151350, 176912, 24780, 161300, 53390, 165520, 64790], "backgroundColor": "#95A5A6", "borderWidth": 0, "stack": "gastos"}, {"label": "Combustible", "data": [163360, 63106, 146958, 26190, 172128, 124549, 315188, 111762, 151327, 158721, 73412, 54819], "backgroundColor": "#F39C12", "borderWidth": 0, "stack": "gastos"}, {"label": "Condominio/Gastos comunes", "data": [0, 251335, 126819, 190169, 176667, 310970, 127736, 128181, 177431, 52018, 0, 0], "backgroundColor": "#9B59B6", "borderWidth": 0, "stack": "gastos"}, {"label": "Ropa/Moda", "data": [89220, 0, 147193, 172280, 74892, 246950, 35370, 323111, 200000, 229970, 0, 0], "backgroundColor": "#FF7675", "borderWidth": 0, "stack": "gastos"}, {"label": "Donaciones/Aportes", "data": [5000, 40000, 40000, 60000, 70000, 40000, 95400, 340000, 65000, 40000, 40000, 40000], "backgroundColor": "#00B894", "borderWidth": 0, "stack": "gastos"}, {"label": "Servicios digitales", "data": [65357, 57084, 15680, 53990, 76597, 137206, 204448, 30920, 80920, 55920, 32008, 30920], "backgroundColor": "#6C5CE7", "borderWidth": 0, "stack": "gastos"}, {"label": "Vinos/Bebidas", "data": [40930, 30980, 30980, 34580, 30980, 52470, 155510, 48850, 35380, 114220, 37580, 37580], "backgroundColor": "#A29BFE", "borderWidth": 0, "stack": "gastos"}, {"label": "Hogar/Limpieza", "data": [0, 0, 0, 62875, 46400, 0, 0, 157131, 240800, 0, 34300, 26000], "backgroundColor": "#74B9FF", "borderWidth": 0, "stack": "gastos"}, {"label": "Cosmetica/Belleza", "data": [98392, 1500, 18558, 0, 93010, 0, 0, 0, 0, 340490, 0, 1200], "backgroundColor": "#FD79A8", "borderWidth": 0, "stack": "gastos"}, {"label": "Estacionamiento", "data": [42556, 52466, 50076, 56900, 93232, 37738, 20817, 42835, 29803, 61080, 2100, 28608], "backgroundColor": "#B2BEC3", "borderWidth": 0, "stack": "gastos"}, {"label": "Mascotas", "data": [40980, 39990, 0, 39990, 38480, 37990, 0, 39990, 39990, 0, 0, 39990], "backgroundColor": "#55EFC4", "borderWidth": 0, "stack": "gastos"}, {"label": "Auto/Vehiculo", "data": [0, 32000, 0, 0, 0, 8405, 0, 0, 0, 0, 118792, 0], "backgroundColor": "#636E72", "borderWidth": 0, "stack": "gastos"}, {"label": "Tecnologia", "data": [0, 59990, 0, 0, 0, 0, 0, 0, 0, 0, 0, 62295], "backgroundColor": "#0984E3", "borderWidth": 0, "stack": "gastos"}, {"label": "Cine/Entretenimiento", "data": [31000, 0, 47771, 0, 0, 0, 0, 0, 0, 0, 0, 0], "backgroundColor": "#D63031", "borderWidth": 0, "stack": "gastos"}, {"label": "Telecom/TV", "data": [0, 0, 0, 0, 0, 10000, 0, 5000, 0, 10000, 41475, 0], "backgroundColor": "#FDCB6E", "borderWidth": 0, "stack": "gastos"}, {"label": "Intereses/Cargos bancarios", "data": [2322, 1970, 0, 0, 67, 3939, 7185, 321, 0, 1213, 0, 0], "backgroundColor": "#D35400", "borderWidth": 0, "stack": "gastos"}, {"label": "Peajes/Autopistas", "data": [0, 0, 15838, 0, 0, 0, 0, 0, 0, 0, 0, 0], "backgroundColor": "#DFE6E9", "borderWidth": 0, "stack": "gastos"}, {"label": "Mediana ($4,723,334)", "data": [4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334, 4723334], "type": "line", "borderColor": "#00B894", "borderWidth": 2, "borderDash": [6, 4], "pointRadius": 0, "fill": false, "order": 0, "stack": null}, {"label": "Promedio ($5,137,525)", "data": [5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525, 5137525], "type": "line", "borderColor": "#E74C3C", "borderWidth": 2, "borderDash": [3, 3], "pointRadius": 0, "fill": false, "order": 0, "stack": null}]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: $` + ctx.parsed.y.toLocaleString('es-CL'),
+          footer: items => `Total: $` + items.reduce((s,i)=>s+i.parsed.y,0).toLocaleString('es-CL'),
         }
       }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: {
+        stacked: true,
+        ticks: { callback: v => '$' + (v/1000000).toFixed(1) + 'M', font: { size: 11 } },
+        grid: { color: '#f0f2f5' }
+      }
     }
-  });
-
-  // Custom category legend sorted by total desc
-  const allCatsSorted = Object.entries(CAT_DATA)
-    .filter(([,d]) => d.total > 0)
-    .sort((a, b) => b[1].total - a[1].total);
-  const legendEl = document.getElementById('barLegend');
-  legendEl.innerHTML = allCatsSorted.map(([cat, d]) =>
-    `<span style="display:inline-flex;align-items:center;margin:3px 10px 3px 0;font-size:11px;color:#636e72">
-      <span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:${d.color};margin-right:5px;flex-shrink:0"></span>
-      ${cat}
-    </span>`
-  ).join('');
-})();
+  }
+});
 
 // ── Pie chart ────────────────────────────────────────────────────────────────
 const pieCtx = document.getElementById('pieChart').getContext('2d');
