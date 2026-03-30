@@ -109,6 +109,14 @@
   .explorer-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
   .explorer-header h3 { font-size: 1.1rem; margin: 0; }
   .explorer-header .sub { color: #636e72; font-size: 0.82rem; }
+
+  /* Collapsible cards */
+  .card > h2 { cursor: pointer; user-select: none; display: flex;
+               justify-content: space-between; align-items: center; }
+  .card > h2::after { content: '▾'; font-size: 0.85rem; color: #b2bec3;
+                       margin-left: 10px; transition: transform .2s; flex-shrink: 0; }
+  .card.collapsed > h2::after { transform: rotate(-90deg); }
+  .card.collapsed > *:not(h2) { display: none !important; }
 </style>
 </head>
 
@@ -1523,32 +1531,9 @@ const txnMonthSel = document.getElementById('txnMonthSel');
 
 // ── Collapsible sections ───────────────────────────────────────────────────
 document.querySelectorAll('.card').forEach(card => {
-  const h2 = card.querySelector('h2');
+  const h2 = card.querySelector(':scope > h2');
   if (!h2) return;
-
-  // Wrap all siblings after h2 in a collapsible body div
-  const body = document.createElement('div');
-  body.className = 'card-body';
-  const children = Array.from(card.children);
-  const h2idx = children.indexOf(h2);
-  children.slice(h2idx + 1).forEach(ch => body.appendChild(ch));
-  card.appendChild(body);
-
-  // Style h2 as toggle header
-  h2.style.cssText += ';cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;margin-bottom:0';
-  const arrow = document.createElement('span');
-  arrow.textContent = '▾';
-  arrow.style.cssText = 'font-size:0.85rem;color:#b2bec3;margin-left:10px;transition:transform .2s;flex-shrink:0';
-  h2.appendChild(arrow);
-
-  h2.addEventListener('click', () => {
-    const open = body.style.display !== 'none';
-    body.style.display = open ? 'none' : '';
-    body.style.marginTop = open ? '' : '18px';
-    arrow.style.transform = open ? 'rotate(-90deg)' : '';
-  });
-
-  body.style.marginTop = '18px';
+  h2.addEventListener('click', () => card.classList.toggle('collapsed'));
 });
 </script>
 </body>
