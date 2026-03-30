@@ -188,6 +188,10 @@
     <div class="card">
       <h2>¿Dónde va el dinero?</h2>
       <div class="month-selector" id="monthSelector"></div>
+      <div style="text-align:center;margin-bottom:6px">
+        <span id="pieTotalLabel" style="font-size:0.75rem;color:#636e72;text-transform:uppercase;letter-spacing:.04em">Total</span><br>
+        <span id="pieTotalValue" style="font-size:1.6rem;font-weight:700;color:#2d3436"></span>
+      </div>
       <div class="pie-wrap">
         <canvas id="pieChart"></canvas>
       </div>
@@ -977,6 +981,9 @@ function updatePie(key) {
   pieChart.update();
   document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`[data-key="${key}"]`).classList.add('active');
+  const total = d.values.reduce((s, v) => s + v, 0);
+  document.getElementById('pieTotalLabel').textContent = key === 'all' ? 'Total todos los meses' : MONTH_LBLS[key] || key;
+  document.getElementById('pieTotalValue').textContent = '$' + total.toLocaleString('es-CL');
 }
 
 // Build month selector buttons
